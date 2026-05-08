@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="es" data-bs-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tennis Bracket Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark app-navbar sticky-top">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="#">🎾 Tennis Bracket Manager</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Abrir navegación">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNavbar">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link" href="#dashboard">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="#torneos">Torneos</a></li>
+            <li class="nav-item"><a class="nav-link" href="#jugadores">Jugadores</a></li>
+            <li class="nav-item"><a class="nav-link" href="#brackets">Brackets</a></li>
+            <li class="nav-item"><a class="nav-link" href="#ranking">Ranking</a></li>
+          </ul>
+          <button class="btn btn-sm theme-toggle ms-lg-3" type="button" id="themeToggleBtn" aria-label="Cambiar a modo oscuro" aria-pressed="false">
+            <span id="themeToggleIcon" aria-hidden="true">🌙</span>
+            <span id="themeToggleText">Modo oscuro</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container-fluid py-4">
+      <section id="dashboard" class="mb-5">
+        <div class="hero-card p-4 p-lg-5 mb-4">
+          <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+              <p class="text-uppercase text-lime fw-bold mb-2">Organizador de torneos</p>
+              <h1 class="display-5 fw-bold mb-3">Gestiona torneos de tenis de principio a fin</h1>
+              <p class="lead mb-0">Registra torneos y jugadores, genera emparejamientos por sexo y nivel, captura puntajes, avanza ganadores automáticamente, consulta ranking y exporta el cuadro a PDF.</p>
+            </div>
+            <div class="col-lg-4">
+              <div class="quick-card">
+                <h2 class="h5">Acciones rápidas</h2>
+                <div class="d-grid gap-2">
+                  <a class="btn btn-light" href="#torneos">Crear torneo</a>
+                  <a class="btn btn-outline-light" href="#jugadores">Registrar jugador</a>
+                  <a class="btn btn-outline-light" href="#brackets">Generar bracket</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3" id="statsCards"></div>
+      </section>
+
+      <section id="torneos" class="mb-5">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Administración</p>
+            <h2>Torneos</h2>
+          </div>
+          <button class="btn btn-outline-danger btn-sm" id="resetDemoBtn">Borrar todos los datos</button>
+        </div>
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <div class="card shadow-sm h-100">
+              <div class="card-body">
+                <h3 class="h5 mb-3" id="tournamentFormTitle">Nuevo torneo</h3>
+                <form id="tournamentForm" class="needs-validation" novalidate>
+                  <input type="hidden" id="tournamentId">
+                  <div class="mb-3">
+                    <label class="form-label" for="tournamentName">Nombre</label>
+                    <input class="form-control" id="tournamentName" required placeholder="Torneo Primavera">
+                    <div class="invalid-feedback">Captura el nombre del torneo.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label" for="tournamentPlace">Lugar</label>
+                    <input class="form-control" id="tournamentPlace" required placeholder="Club Central">
+                    <div class="invalid-feedback">Captura el lugar.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label" for="tournamentDate">Fecha</label>
+                    <input type="date" class="form-control" id="tournamentDate" required>
+                    <div class="invalid-feedback">Selecciona la fecha.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label" for="tournamentStatus">Estado</label>
+                    <select class="form-select" id="tournamentStatus">
+                      <option>Pendiente</option>
+                      <option>En curso</option>
+                      <option>Finalizado</option>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label" for="tournamentDescription">Descripción</label>
+                    <textarea class="form-control" id="tournamentDescription" rows="3" placeholder="Torneo amateur por categorías"></textarea>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <button class="btn btn-success flex-grow-1" type="submit">Guardar torneo</button>
+                    <button class="btn btn-outline-secondary" type="button" id="cancelTournamentEditBtn">Limpiar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-8">
+            <div class="card shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                  <h3 class="h5 mb-0">Listado de torneos</h3>
+                  <span class="badge text-bg-success" id="tournamentCountBadge">0 torneos</span>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle">
+                    <thead>
+                      <tr>
+                        <th>Nombre</th>
+                        <th>Lugar</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th>Jugadores</th>
+                        <th class="text-end">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tournamentsTable"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="jugadores" class="mb-5">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Inscripciones</p>
+            <h2>Jugadores</h2>
+          </div>
+        </div>
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <div class="card shadow-sm h-100">
+              <div class="card-body">
+                <h3 class="h5 mb-3" id="playerFormTitle">Nuevo jugador</h3>
+                <form id="playerForm" class="needs-validation" novalidate>
+                  <input type="hidden" id="playerId">
+                  <div class="mb-3">
+                    <label class="form-label" for="playerName">Nombre completo</label>
+                    <input class="form-control" id="playerName" required placeholder="Ana López">
+                    <div class="invalid-feedback">Captura el nombre del jugador.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label" for="playerTournament">Torneo</label>
+                    <select class="form-select" id="playerTournament" required></select>
+                    <div class="invalid-feedback">Selecciona un torneo.</div>
+                  </div>
+                  <div class="row g-2">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label" for="playerGender">Sexo</label>
+                      <select class="form-select" id="playerGender" required>
+                        <option value="">Selecciona</option>
+                        <option>Femenino</option>
+                        <option>Masculino</option>
+                      </select>
+                      <div class="invalid-feedback">Selecciona el sexo.</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label" for="playerLevel">Nivel</label>
+                      <select class="form-select" id="playerLevel" required>
+                        <option value="">Selecciona</option>
+                        <option>Principiante</option>
+                        <option>Intermedio</option>
+                        <option>Avanzado</option>
+                      </select>
+                      <div class="invalid-feedback">Selecciona el nivel.</div>
+                    </div>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <button class="btn btn-success flex-grow-1" type="submit">Guardar jugador</button>
+                    <button class="btn btn-outline-secondary" type="button" id="cancelPlayerEditBtn">Limpiar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-8">
+            <div class="card shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                  <h3 class="h5 mb-0">Listado de jugadores</h3>
+                  <select class="form-select form-select-sm w-auto" id="playersFilterTournament"></select>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-striped table-hover align-middle">
+                    <thead>
+                      <tr>
+                        <th>Jugador</th>
+                        <th>Torneo</th>
+                        <th>Sexo</th>
+                        <th>Nivel</th>
+                        <th class="text-end">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody id="playersTable"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="brackets" class="mb-5">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Competencia</p>
+            <h2>Brackets y resultados</h2>
+          </div>
+        </div>
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <div class="row g-3 align-items-end">
+              <div class="col-lg-5">
+                <label class="form-label" for="bracketTournament">Torneo</label>
+                <select class="form-select" id="bracketTournament"></select>
+              </div>
+              <div class="col-lg-7 d-flex flex-wrap gap-2">
+                <button class="btn btn-success" id="generateBracketBtn">Generar / regenerar bracket</button>
+                <button class="btn btn-outline-primary" id="exportPdfBtn">Exportar PDF</button>
+                <button class="btn btn-outline-secondary" id="printBtn">Imprimir</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="bracketExportArea">
+          <div id="selectedTournamentSummary" class="mb-3"></div>
+          <div id="bracketsContainer"></div>
+        </div>
+      </section>
+
+      <section id="ranking" class="mb-5">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Desempeño</p>
+            <h2>Ranking</h2>
+          </div>
+        </div>
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="row g-3 mb-3">
+              <div class="col-md-5">
+                <label class="form-label" for="rankingTournament">Filtrar por torneo</label>
+                <select class="form-select" id="rankingTournament"></select>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Jugador</th>
+                    <th>Torneo</th>
+                    <th>Sexo / Nivel</th>
+                    <th>PJ</th>
+                    <th>PG</th>
+                    <th>PP</th>
+                    <th>PF</th>
+                    <th>PC</th>
+                    <th>Dif.</th>
+                    <th>Puntos</th>
+                  </tr>
+                </thead>
+                <tbody id="rankingTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal fade" id="scoreModal" tabindex="-1" aria-labelledby="scoreModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <form class="modal-content" id="scoreForm">
+          <div class="modal-header">
+            <h2 class="modal-title fs-5" id="scoreModalLabel">Editar resultado</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="scoreBracketId">
+            <input type="hidden" id="scoreMatchId">
+            <div class="mb-3">
+              <label class="form-label" id="scorePlayer1Label" for="scorePlayer1">Jugador 1</label>
+              <input type="number" min="0" class="form-control" id="scorePlayer1" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" id="scorePlayer2Label" for="scorePlayer2">Jugador 2</label>
+              <input type="number" min="0" class="form-control" id="scorePlayer2" required>
+            </div>
+            <div class="alert alert-info mb-0">El ganador se calcula con el puntaje más alto y avanza automáticamente a la siguiente ronda.</div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-success">Guardar resultado</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div id="appToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body" id="toastMessage">Operación completada</div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
