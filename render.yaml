@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: tennis-bracket-api
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    plan: free          # upgrade to starter/standard for persistent storage
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Set FRONTEND_URL to your GitHub Pages URL to restrict CORS
+      # e.g. https://yourusername.github.io
+      - key: FRONTEND_URL
+        sync: false     # set this manually in the Render dashboard
