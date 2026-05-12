@@ -7,8 +7,11 @@ const bracketsRouter = require('./routes/brackets');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+const rawOrigin = process.env.FRONTEND_URL || '';
+const allowedOrigin = rawOrigin ? new URL(rawOrigin).origin : '*';
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+  origin: allowedOrigin,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type']
 }));
